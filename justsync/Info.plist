@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>JustSync 需要访问您的照片库以便通过 Web 界面共享和管理照片</string>
+    
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>JustSync 需要权限来管理您的照片</string>
+    
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>JustSync 需要使用本地网络来提供 Web 服务</string>
+    
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_http._tcp</string>
+    </array>
+    
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+        <string>processing</string>
+    </array>
+    
+    <key>UIApplicationSupportsIndirectInputEvents</key>
+    <true/>
+    
+    <key>UILaunchScreen</key>
+    <dict/>
+</dict>
+</plist>

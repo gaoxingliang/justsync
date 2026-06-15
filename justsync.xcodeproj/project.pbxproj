@@ -14,6 +14,9 @@
 		2B33065C2FDF85940097D5AD /* justsyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B33065B2FDF85940097D5AD /* justsyncTests.swift */; };
 		2B3306662FDF85950097D5AD /* justsyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3306652FDF85950097D5AD /* justsyncUITests.swift */; };
 		2B3306682FDF85950097D5AD /* justsyncUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3306672FDF85950097D5AD /* justsyncUITestsLaunchTests.swift */; };
+		2B3306742FDF85A00097D5AD /* PhotoLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3306732FDF85A00097D5AD /* PhotoLibraryManager.swift */; };
+		2B3306752FDF85A00097D5AD /* WebServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3306762FDF85A00097D5AD /* WebServerManager.swift */; };
+		2B3306772FDF85A00097D5AD /* WebInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3306782FDF85A00097D5AD /* WebInterface.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +47,9 @@
 		2B3306612FDF85950097D5AD /* justsyncUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = justsyncUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B3306652FDF85950097D5AD /* justsyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = justsyncUITests.swift; sourceTree = "<group>"; };
 		2B3306672FDF85950097D5AD /* justsyncUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = justsyncUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		2B3306732FDF85A00097D5AD /* PhotoLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryManager.swift; sourceTree = "<group>"; };
+		2B3306762FDF85A00097D5AD /* WebServerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebServerManager.swift; sourceTree = "<group>"; };
+		2B3306782FDF85A00097D5AD /* WebInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebInterface.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +102,9 @@
 			children = (
 				2B33064A2FDF85920097D5AD /* justsyncApp.swift */,
 				2B33064C2FDF85920097D5AD /* ContentView.swift */,
+				2B3306732FDF85A00097D5AD /* PhotoLibraryManager.swift */,
+				2B3306762FDF85A00097D5AD /* WebServerManager.swift */,
+				2B3306782FDF85A00097D5AD /* WebInterface.swift */,
 				2B33064E2FDF85940097D5AD /* Assets.xcassets */,
 				2B3306502FDF85940097D5AD /* Preview Content */,
 			);
@@ -258,6 +267,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B33064D2FDF85920097D5AD /* ContentView.swift in Sources */,
+				2B3306742FDF85A00097D5AD /* PhotoLibraryManager.swift in Sources */,
+				2B3306752FDF85A00097D5AD /* WebServerManager.swift in Sources */,
+				2B3306772FDF85A00097D5AD /* WebInterface.swift in Sources */,
 				2B33064B2FDF85920097D5AD /* justsyncApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -420,6 +432,9 @@
 				DEVELOPMENT_TEAM = 7U4463ZZQY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "JustSync 需要使用本地网络来提供 Web 服务";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "JustSync 需要权限来管理您的照片";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "JustSync 需要访问您的照片库以便通过 Web 界面共享和管理照片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -449,6 +464,9 @@
 				DEVELOPMENT_TEAM = 7U4463ZZQY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "JustSync 需要使用本地网络来提供 Web 服务";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "JustSync 需要权限来管理您的照片";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "JustSync 需要访问您的照片库以便通过 Web 界面共享和管理照片";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

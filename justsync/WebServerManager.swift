@@ -188,15 +188,18 @@ class WebServerManager: ObservableObject {
             return
         }
         
-        let assets = photoManager.getAllAssets()
-        var photoList: [[String: Any]] = []
-        
-        for asset in assets {
-            let metadata = photoManager.getAssetMetadata(asset: asset)
-            photoList.append(metadata)
+        Task {
+            await photoManager.loadPhotos()
+            let assets = photoManager.getAllAssets()
+            var photoList: [[String: Any]] = []
+            
+            for asset in assets {
+                let metadata = photoManager.getAssetMetadata(asset: asset)
+                photoList.append(metadata)
+            }
+            
+            sendJSONResponse(connection: connection, data: ["photos": photoList])
         }
-        
-        sendJSONResponse(connection: connection, data: ["photos": photoList])
     }
     
     private func handleGetPhoto(identifier: String, rangeHeader: String?, connection: NWConnection) {

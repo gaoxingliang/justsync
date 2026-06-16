@@ -295,10 +295,100 @@ extension WebServerManager {
                 flex-wrap: wrap;
             }
         }
+
+        /* 下载提示 Toast 样式 */
+        .download-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            width: 280px;
+            transition: all 0.3s ease;
+        }
+        
+        .download-toast.active {
+            display: flex;
+        }
+        
+        .download-toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .download-toast-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007AFF;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .download-toast-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        
+        .download-toast-progress-bg {
+            width: 100%;
+            height: 6px;
+            background: #e5e5ea;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .download-toast-progress-bar {
+            width: 100%;
+            height: 100%;
+            background: #007AFF;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.2s ease;
+        }
+        
+        .download-toast.success {
+            background: #34C759;
+            border-color: #34C759;
+        }
+        
+        .download-toast.success .download-toast-text {
+            color: white;
+        }
+        
+        .download-toast.success .download-toast-spinner {
+            display: none;
+        }
+        
+        .download-toast.success .download-toast-progress-bg {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- 下载提示 Toast -->
+    <div class="download-toast" id="downloadToast">
+        <div class="download-toast-content">
+            <div class="download-toast-spinner"></div>
+            <div class="download-toast-text" id="downloadToastText">正在准备下载...</div>
+        </div>
+        <div class="download-toast-progress-bg">
+            <div class="download-toast-progress-bar" id="downloadToastBar"></div>
+        </div>
+    </div>
     
     <div class="header">
         <div class="header-content">
@@ -449,8 +539,18 @@ extension WebServerManager {
         
         async function downloadSelected() {
             const progressBar = document.getElementById('progressBar');
+            const toast = document.getElementById('downloadToast');
+            const toastText = document.getElementById('downloadToastText');
+            const toastBar = document.getElementById('downloadToastBar');
+            
             const identifiers = Array.from(selectedPhotos);
+            const total = identifiers.length;
             let completed = 0;
+            
+            progressBar.style.transform = 'scaleX(0)';
+            toast.className = 'download-toast active';
+            toastText.textContent = `正在准备下载...`;
+            toastBar.style.transform = 'scaleX(0)';
             
             for (const identifier of identifiers) {
                 try {
@@ -468,18 +568,26 @@ extension WebServerManager {
                     window.URL.revokeObjectURL(url);
                     
                     completed++;
-                    progressBar.style.transform = `scaleX(${completed / identifiers.length})`;
+                    const progress = completed / total;
+                    progressBar.style.transform = `scaleX(${progress})`;
+                    toastBar.style.transform = `scaleX(${progress})`;
+                    toastText.textContent = `正在下载: ${completed} / ${total}`;
                     
                     // 添加小延迟以确保浏览器能处理多个下载
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await new Promise(resolve => setTimeout(resolve, 200));
                 } catch (error) {
                     console.error('Download failed:', error);
                 }
             }
             
+            // 显示下载完成状态
+            toast.className = 'download-toast active success';
+            toastText.textContent = `🎉 成功下载 ${total} 个文件!`;
+            
             setTimeout(() => {
                 progressBar.style.transform = 'scaleX(0)';
-            }, 1000);
+                toast.className = 'download-toast';
+            }, 3000);
         }
         
         async function deleteSelected() {

@@ -5,13 +5,28 @@ import CoreLocation
 import AVFoundation
 import UniformTypeIdentifiers
 
-class PhotoLibraryManager: ObservableObject {
+class PhotoLibraryManager: NSObject, ObservableObject, PHPhotoLibraryChangeObserver {
     @Published var photoCount = 0
     @Published var videoCount = 0
     @Published var totalCount = 0
     @Published var hasPermission = false
     
     private var allAssets: [PHAsset] = []
+    
+    override init() {
+        super.init()
+        PHPhotoLibrary.shared().register(self)
+    }
+    
+    deinit {
+        PHPhotoLibrary.shared().unregisterChangeObserver(self)
+    }
+    
+    func photoLibraryDidChange(_ changeInstance: PHChange) {
+        Task {
+            await loadPhotos()
+        }
+    }
     
     func requestPermission() async {
         let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
@@ -21,32 +36,34 @@ class PhotoLibraryManager: ObservableObject {
     }
     
     func loadPhotos() async {
+        let photoOptions = PHFetchOptions()
+        photoOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        let imgCount = PHAsset.fetchAssets(with: photoOptions).count
+        
+        let videoOptions = PHFetchOptions()
+        videoOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.video.rawValue)
+        let vidCount = PHAsset.fetchAssets(with: videoOptions).count
+        
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
         let allPhotosResult = PHAsset.fetchAssets(with: fetchOptions)
-        var assets: [PHAsset] = []
-        var photos = 0
-        var videos = 0
         
-        allPhotosResult.enumerateObjects { asset, _, _ in
-            assets.append(asset)
-            if asset.mediaType == .image {
-                photos += 1
-            } else if asset.mediaType == .video {
-                videos += 1
+        // Enumerate assets in a background task to prevent blocking the main thread / cooperative pool
+        let assets = await Task.detached(priority: .userInitiated) { () -> [PHAsset] in
+            var tempAssets: [PHAsset] = []
+            tempAssets.reserveCapacity(allPhotosResult.count)
+            allPhotosResult.enumerateObjects { asset, _, _ in
+                tempAssets.append(asset)
             }
-        }
-        
-        let finalAssets = assets
-        let finalPhotos = photos
-        let finalVideos = videos
+            return tempAssets
+        }.value
         
         await MainActor.run {
-            self.allAssets = finalAssets
-            self.photoCount = finalPhotos
-            self.videoCount = finalVideos
-            self.totalCount = finalAssets.count
+            self.allAssets = assets
+            self.photoCount = imgCount
+            self.videoCount = vidCount
+            self.totalCount = assets.count
         }
     }
     

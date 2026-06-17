@@ -127,18 +127,73 @@ class WebServerManager: ObservableObject {
         receiveRequest(connection)
     }
     
-    private func receiveRequest(_ connection: NWConnection) {
+    private func receiveRequest(_ connection: NWConnection, buffer: Data = Data()) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, isComplete, error in
+            guard let self = self else { return }
+            
+            var newBuffer = buffer
             if let data = data, !data.isEmpty {
-                self?.handleHTTPRequest(data: data, connection: connection)
+                newBuffer.append(data)
+            }
+            
+            // Check if we have received the full HTTP request (headers + body)
+            if let (headersLength, contentLength) = self.parseContentLength(from: newBuffer) {
+                let totalExpectedLength = headersLength + contentLength
+                if newBuffer.count >= totalExpectedLength {
+                    self.handleHTTPRequest(data: newBuffer, connection: connection)
+                    return
+                }
+            } else {
+                // If there's no Content-Length header, we check if we have received the end of headers (\r\n\r\n)
+                if let bodyStartRange = newBuffer.range(of: "\r\n\r\n".data(using: .utf8)!) {
+                    let headersData = newBuffer[..<bodyStartRange.lowerBound]
+                    if let headersString = String(data: headersData, encoding: .utf8) {
+                        let lines = headersString.components(separatedBy: "\r\n")
+                        if let firstLine = lines.first {
+                            let components = firstLine.components(separatedBy: " ")
+                            let method = components.first ?? "GET"
+                            if method != "POST" && method != "PUT" {
+                                // For non-POST/PUT requests, we don't expect a body, so we can process it immediately
+                                self.handleHTTPRequest(data: newBuffer, connection: connection)
+                                return
+                            }
+                        }
+                    }
+                }
             }
             
             if isComplete {
-                connection.cancel()
+                if !newBuffer.isEmpty {
+                    self.handleHTTPRequest(data: newBuffer, connection: connection)
+                } else {
+                    connection.cancel()
+                }
             } else if error == nil {
-                self?.receiveRequest(connection)
+                self.receiveRequest(connection, buffer: newBuffer)
             }
         }
+    }
+    
+    private func parseContentLength(from data: Data) -> (headersLength: Int, contentLength: Int)? {
+        guard let separatorRange = data.range(of: "\r\n\r\n".data(using: .utf8)!) else {
+            return nil
+        }
+        let headersData = data[..<separatorRange.lowerBound]
+        guard let headersString = String(data: headersData, encoding: .utf8) else {
+            return nil
+        }
+        
+        let lines = headersString.components(separatedBy: "\r\n")
+        for line in lines {
+            let parts = line.split(separator: ":", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
+            if parts.count == 2, parts[0].caseInsensitiveCompare("Content-Length") == .orderedSame {
+                if let contentLength = Int(parts[1]) {
+                    let headersLength = separatorRange.upperBound
+                    return (headersLength, contentLength)
+                }
+            }
+        }
+        return nil
     }
     
     private func handleHTTPRequest(data: Data, connection: NWConnection) {

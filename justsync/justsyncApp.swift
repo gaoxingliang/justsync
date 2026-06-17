@@ -35,10 +35,13 @@ struct JustSyncApp: App {
         switch phase {
         case .active:
             print("App became active")
+            UIApplication.shared.isIdleTimerDisabled = true
         case .inactive:
             print("App became inactive")
+            UIApplication.shared.isIdleTimerDisabled = false
         case .background:
             print("App moved to background - server will continue running")
+            UIApplication.shared.isIdleTimerDisabled = false
             keepAliveInBackground()
         @unknown default:
             break

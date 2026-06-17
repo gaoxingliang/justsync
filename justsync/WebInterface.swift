@@ -612,11 +612,12 @@ extension WebServerManager {
                     toggleSelectionMode();
                     await loadPhotos();
                 } else {
-                    alert('删除失败');
+                    const errorMsg = await response.text();
+                    alert('删除失败: ' + errorMsg);
                 }
             } catch (error) {
                 console.error('Delete failed:', error);
-                alert('删除失败');
+                alert('删除失败: ' + error.message);
             }
         }
         
